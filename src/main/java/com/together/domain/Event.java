@@ -1,18 +1,20 @@
 package com.together.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import static javax.persistence.GenerationType.AUTO;
 
 @Getter
 @NoArgsConstructor
 @Entity
+@EqualsAndHashCode(exclude = "id")
 public class Event {
 
     @Id
@@ -23,15 +25,35 @@ public class Event {
 
     private String description;
 
+    private LocalDateTime date;
+
     @Embedded
     private Location location;
 
     private Activity activity;
 
-    public Event(String name, String description, Location location, Activity activity) {
+    @OneToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    @ManyToMany
+    @JoinTable(name = "event_user",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> participants;
+
+    public Event(String name, String description, LocalDateTime date, Location location, Activity activity, User owner) {
         this.name = name;
         this.description = description;
+        this.date = date;
         this.location = location;
         this.activity = activity;
+        this.owner = owner;
+        this.participants = new HashSet<>();
+    }
+
+    public void addParticipant(User user) {
+        participants.add(user);
     }
 }
