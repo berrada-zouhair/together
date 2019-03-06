@@ -3,6 +3,7 @@ package com.together.domain;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class Event {
 
     @OneToOne
     @JoinColumn(name = "owner_id")
+    @Setter
     private User owner;
 
     @ManyToMany
@@ -43,17 +45,17 @@ public class Event {
     )
     private Set<User> participants;
 
-    public Event(String name, String description, LocalDateTime date, Location location, Activity activity, User owner) {
+    public Event(String name, String description, LocalDateTime date, Location location, Activity activity) {
         this.name = name;
         this.description = description;
         this.date = date;
         this.location = location;
         this.activity = activity;
-        this.owner = owner;
         this.participants = new HashSet<>();
     }
 
     public void addParticipant(User user) {
         participants.add(user);
     }
+
 }

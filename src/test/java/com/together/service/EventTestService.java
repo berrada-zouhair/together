@@ -24,7 +24,7 @@ public class EventTestService {
     @Test
     public void addEvent() {
         Location location = new Location(0D, 0D);
-        Event event = new Event("EventName", "Description", LocalDateTime.now(), location, Activity.FOOTBALL, new User());
+        Event event = new Event("EventName", "Description", LocalDateTime.now(), location, Activity.FOOTBALL);
         EventService eventService = new EventService(eventRepository);
         eventService.add(event);
         verify(eventRepository, times(1)).save(event);

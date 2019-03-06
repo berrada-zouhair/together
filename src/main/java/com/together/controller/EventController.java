@@ -21,7 +21,12 @@ public class EventController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<Void> createEvent(@RequestBody Event event) {
+    public ResponseEntity<Void> createEvent(@RequestBody Event event, @RequestParam Long owner) {
+        User user = userService.get(owner);
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        event.setOwner(user);
         Long eventId = eventService.add(event);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{eventId}").buildAndExpand(eventId).toUri();
         return ResponseEntity.created(uri).build();
@@ -37,10 +42,14 @@ public class EventController {
     }
 
     @PostMapping("/{eventId}/participant/{participantId}")
-    public void addParticipant(@PathVariable Long eventId, @PathVariable Long participantId) {
+    public ResponseEntity<Void> addParticipant(@PathVariable Long eventId, @PathVariable Long participantId) {
         Event event = eventService.get(eventId);
         User user = userService.get(participantId);
+        if (user == null || event == null) {
+            return ResponseEntity.badRequest().build();
+        }
         event.addParticipant(user);
         eventService.add(event);
+        return ResponseEntity.noContent().build();
     }
 }
