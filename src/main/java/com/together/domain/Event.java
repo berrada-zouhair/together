@@ -39,11 +39,18 @@ public class Event {
     private User owner;
 
     @ManyToMany
-    @JoinTable(name = "event_user",
+    @JoinTable(name = "event_participant",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> participants;
+
+    @ManyToMany
+    @JoinTable(name = "event_like",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> likers;
 
     public Event(String name, String description, LocalDateTime date, Location location, Activity activity) {
         this.name = name;
@@ -52,10 +59,14 @@ public class Event {
         this.location = location;
         this.activity = activity;
         this.participants = new HashSet<>();
+        this.likers = new HashSet<>();
     }
 
     public void addParticipant(User user) {
         participants.add(user);
     }
 
+    public void addLiker(User user) {
+        likers.add(user);
+    }
 }
