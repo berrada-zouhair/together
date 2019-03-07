@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import static com.together.domain.Activity.FOOTBALL;
+import static com.together.utils.UrlUtils.extractIdFromUri;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.LOCATION;
@@ -29,18 +30,12 @@ public class EventControllerTest {
     private TestRestTemplate restTemplate;
 
 
-    private String extractUserIdFromUri(URI uri) {
-        String uriString = uri.toString();
-        String[] split = uriString.split("/");
-        return split[split.length - 1];
-    }
-
     @Test
     public void should_create_event_and_get_it() throws Exception {
         User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
         URI uri = restTemplate.postForLocation("/user", owner);
         assertThat(uri).isNotNull();
-        String ownerId = extractUserIdFromUri(uri);
+        String ownerId = extractIdFromUri(uri);
         Event event = new Event("EventName", "Description",
                 LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
         ResponseEntity<Void> responseEntity = restTemplate.postForEntity("/event?owner=" + ownerId,
@@ -73,7 +68,7 @@ public class EventControllerTest {
     public void should_add_participants_to_event() throws Exception {
         User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
         URI uri = restTemplate.postForLocation("/user", owner);
-        String ownerId = extractUserIdFromUri(uri);
+        String ownerId = extractIdFromUri(uri);
 
         Event event = new Event("EventName", "Description",
                 LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
@@ -84,11 +79,11 @@ public class EventControllerTest {
 
         User participant1 = new User("firstName1", "lastName1", 25, "city1", new byte[]{});
         uri = restTemplate.postForLocation("/user", participant1);
-        String participantId1 = extractUserIdFromUri(uri);
+        String participantId1 = extractIdFromUri(uri);
 
         User participant2 = new User("firstName2", "lastName2", 18, "city2", new byte[]{});
         uri = restTemplate.postForLocation("/user", participant2);
-        String participantId2 = extractUserIdFromUri(uri);
+        String participantId2 = extractIdFromUri(uri);
 
         restTemplate.postForLocation(eventLocation + "/participant/" + participantId1, null);
         restTemplate.postForLocation(eventLocation + "/participant/" + participantId2, null);
@@ -110,7 +105,7 @@ public class EventControllerTest {
     public void should_have_status_400_when_adding_not_existing_participant_to_an_event() throws Exception {
         User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
         URI uri = restTemplate.postForLocation("/user", owner);
-        String ownerId = extractUserIdFromUri(uri);
+        String ownerId = extractIdFromUri(uri);
 
         Event event = new Event("EventName", "Description",
                 LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
@@ -128,7 +123,7 @@ public class EventControllerTest {
     public void should_have_status_400_when_adding_participant_to_a_not_existing_event() throws Exception {
         User user = new User("firstName", "lastName", 39, "city", new byte[]{});
         URI uri = restTemplate.postForLocation("/user", user);
-        String userId = extractUserIdFromUri(uri);
+        String userId = extractIdFromUri(uri);
 
         ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/participant/" + userId, null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -139,7 +134,7 @@ public class EventControllerTest {
     public void should_add_liker_to_an_event() throws Exception {
         User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
         URI uri = restTemplate.postForLocation("/user", owner);
-        String ownerId = extractUserIdFromUri(uri);
+        String ownerId = extractIdFromUri(uri);
 
         Event event = new Event("EventName", "Description",
                 LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
@@ -147,7 +142,7 @@ public class EventControllerTest {
 
         User liker = new User("firstName2", "lastName2", 18, "city2", new byte[]{});
         uri = restTemplate.postForLocation("/user", liker);
-        String participantId = extractUserIdFromUri(uri);
+        String participantId = extractIdFromUri(uri);
 
         restTemplate.postForLocation(eventLocation + "/participant/" + participantId, null);
 
@@ -167,7 +162,7 @@ public class EventControllerTest {
     public void should_have_status_400_when_adding_liker_to_a_not_existing_event() throws Exception {
         User user = new User("firstName", "lastName", 39, "city", new byte[]{});
         URI uri = restTemplate.postForLocation("/user", user);
-        String userId = extractUserIdFromUri(uri);
+        String userId = extractIdFromUri(uri);
 
         ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/liker/" + userId, null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
@@ -178,7 +173,7 @@ public class EventControllerTest {
     public void should_have_status_400_when_adding_not_existing_liker_to_an_event() throws Exception {
         User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
         URI uri = restTemplate.postForLocation("/user", owner);
-        String ownerId = extractUserIdFromUri(uri);
+        String ownerId = extractIdFromUri(uri);
 
         Event event = new Event("EventName", "Description",
                 LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
