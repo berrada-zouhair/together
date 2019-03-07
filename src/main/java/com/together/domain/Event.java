@@ -52,6 +52,10 @@ public class Event {
     )
     private Set<User> likers;
 
+    @OneToMany
+    @JoinColumn(name = "comment_id")
+    private Set<Comment> comments;
+
     public Event(String name, String description, LocalDateTime date, Location location, Activity activity) {
         this.name = name;
         this.description = description;
@@ -60,6 +64,7 @@ public class Event {
         this.activity = activity;
         this.participants = new HashSet<>();
         this.likers = new HashSet<>();
+        this.comments = new HashSet<>();
     }
 
     public void addParticipant(User user) {
@@ -68,5 +73,9 @@ public class Event {
 
     public void addLiker(User user) {
         likers.add(user);
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
     }
 }
