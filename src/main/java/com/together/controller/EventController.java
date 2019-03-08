@@ -44,10 +44,10 @@ public class EventController {
         return event;
     }
 
-    @PostMapping("/{eventId}/participant/{participantId}")
-    public ResponseEntity<Void> addParticipant(@PathVariable Long eventId, @PathVariable Long participantId) {
+    @PostMapping("/{eventId}/participant")
+    public ResponseEntity<Void> addParticipant(@PathVariable Long eventId, @RequestParam Long userId) {
         Event event = eventService.get(eventId);
-        User user = userService.get(participantId);
+        User user = userService.get(userId);
         if (user == null || event == null) {
             return ResponseEntity.badRequest().build();
         }

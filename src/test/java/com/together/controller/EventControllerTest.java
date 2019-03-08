@@ -87,8 +87,8 @@ public class EventControllerTest {
         uri = restTemplate.postForLocation("/user", participant2);
         String participantId2 = extractIdFromUri(uri);
 
-        restTemplate.postForLocation(eventLocation + "/participant/" + participantId1, null);
-        restTemplate.postForLocation(eventLocation + "/participant/" + participantId2, null);
+        restTemplate.postForLocation(eventLocation + "/participant?userId=" + participantId1, null);
+        restTemplate.postForLocation(eventLocation + "/participant?userId=" + participantId2, null);
 
         event.addParticipant(participant1);
         event.addParticipant(participant2);
@@ -116,7 +116,7 @@ public class EventControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(CREATED);
         String eventLocation = responseEntity.getHeaders().get(LOCATION).get(0);
 
-        responseEntity = restTemplate.postForEntity(eventLocation + "/participant/9999", null, Void.class);
+        responseEntity = restTemplate.postForEntity(eventLocation + "/participant?userId=9999", null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
     }
@@ -127,7 +127,7 @@ public class EventControllerTest {
         URI uri = restTemplate.postForLocation("/user", user);
         String userId = extractIdFromUri(uri);
 
-        ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/participant/" + userId, null, Void.class);
+        ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/participant?userId=" + userId, null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
     }
@@ -146,7 +146,7 @@ public class EventControllerTest {
         uri = restTemplate.postForLocation("/user", liker);
         String participantId = extractIdFromUri(uri);
 
-        restTemplate.postForLocation(eventLocation + "/participant/" + participantId, null);
+        restTemplate.postForLocation(eventLocation + "/participant?userId=" + participantId, null);
 
         restTemplate.postForLocation(eventLocation + "/liker?userId=" + participantId, null);
         restTemplate.postForLocation(eventLocation + "/liker?userId=" + ownerId, null);
