@@ -1,5 +1,6 @@
 package com.together.controller;
 
+import com.together.domain.Comment;
 import com.together.domain.Event;
 import com.together.domain.Location;
 import com.together.domain.User;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import static com.together.domain.Activity.FOOTBALL;
 import static com.together.utils.UrlUtils.extractIdFromUri;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.LOCATION;
@@ -85,8 +87,8 @@ public class EventControllerTest {
         uri = restTemplate.postForLocation("/user", participant2);
         String participantId2 = extractIdFromUri(uri);
 
-        restTemplate.postForLocation(eventLocation + "/participant/" + participantId1, null);
-        restTemplate.postForLocation(eventLocation + "/participant/" + participantId2, null);
+        restTemplate.postForLocation(eventLocation + "/participant?userId=" + participantId1, null);
+        restTemplate.postForLocation(eventLocation + "/participant?userId=" + participantId2, null);
 
         event.addParticipant(participant1);
         event.addParticipant(participant2);
@@ -114,7 +116,7 @@ public class EventControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(CREATED);
         String eventLocation = responseEntity.getHeaders().get(LOCATION).get(0);
 
-        responseEntity = restTemplate.postForEntity(eventLocation + "/participant/9999", null, Void.class);
+        responseEntity = restTemplate.postForEntity(eventLocation + "/participant?userId=9999", null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
     }
@@ -125,7 +127,7 @@ public class EventControllerTest {
         URI uri = restTemplate.postForLocation("/user", user);
         String userId = extractIdFromUri(uri);
 
-        ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/participant/" + userId, null, Void.class);
+        ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/participant?userId=" + userId, null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
     }
@@ -144,10 +146,10 @@ public class EventControllerTest {
         uri = restTemplate.postForLocation("/user", liker);
         String participantId = extractIdFromUri(uri);
 
-        restTemplate.postForLocation(eventLocation + "/participant/" + participantId, null);
+        restTemplate.postForLocation(eventLocation + "/participant?userId=" + participantId, null);
 
-        restTemplate.postForLocation(eventLocation + "/liker/" + participantId, null);
-        restTemplate.postForLocation(eventLocation + "/liker/" + ownerId, null);
+        restTemplate.postForLocation(eventLocation + "/liker?userId=" + participantId, null);
+        restTemplate.postForLocation(eventLocation + "/liker?userId=" + ownerId, null);
 
         event.addLiker(owner);
         event.addLiker(liker);
@@ -164,7 +166,7 @@ public class EventControllerTest {
         URI uri = restTemplate.postForLocation("/user", user);
         String userId = extractIdFromUri(uri);
 
-        ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/liker/" + userId, null, Void.class);
+        ResponseEntity responseEntity = restTemplate.postForEntity( "/event/9999/liker?userId=" + userId, null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
     }
@@ -182,8 +184,63 @@ public class EventControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(CREATED);
         String eventLocation = responseEntity.getHeaders().get(LOCATION).get(0);
 
-        responseEntity = restTemplate.postForEntity(eventLocation + "/liker/9999", null, Void.class);
+        responseEntity = restTemplate.postForEntity(eventLocation + "/liker?userId=9999", null, Void.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+    }
+
+    @Test
+    public void should_add_comments_to_an_event() throws Exception {
+        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        URI uri = restTemplate.postForLocation("/user", owner);
+        String ownerId = extractIdFromUri(uri);
+
+        Event event = new Event("EventName", "Description",
+                LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
+
+        uri = restTemplate.postForLocation("/event?owner=" + ownerId, event, Void.class);
+        String eventId = extractIdFromUri(uri);
+
+        Comment comment1 = new Comment(LocalDateTime.now(), "text1");
+        comment1.setOwner(owner);
+        Comment comment2 = new Comment(LocalDateTime.now(), "text2");
+        comment2.setOwner(owner);
+
+        restTemplate.postForLocation(uri.toString()+ "/comment?owner=" + ownerId, comment1);
+        restTemplate.postForLocation(uri.toString()+ "/comment?owner=" + ownerId, comment2);
+
+        event.addComment(comment1);
+        event.addComment(comment2);
+
+        Event storedEvent = restTemplate.getForObject("/event/" + eventId, Event.class);
+        Set<Comment> comments = storedEvent.getComments();
+
+        assertThat(comments.size()).isEqualTo(2);
+        assertThat(comments
+                .stream()
+                .map(Comment::getText)
+                .collect(toList())).containsExactlyInAnyOrder("text1", "text2");
+        assertThat(event.getComments()).isEqualTo(storedEvent.getComments());
+    }
+
+    @Test
+    public void should_have_status_400_when_comment_owner_or_event_are_not_existing() throws Exception {
+        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        URI uri = restTemplate.postForLocation("/user", owner);
+        String ownerId = extractIdFromUri(uri);
+
+        Event event = new Event("EventName", "Description",
+                LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
+
+        uri = restTemplate.postForLocation("/event?owner=" + ownerId, event, Void.class);
+        String eventId = extractIdFromUri(uri);
+
+        ResponseEntity<Void> responseEntity =
+                restTemplate.postForEntity("/event/99999/comment?owner="+ownerId, new Comment(), Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
+        responseEntity =
+                restTemplate.postForEntity(uri.toString()+"/comment?owner=9999&event="+eventId, new Comment(), Void.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
+
 }
