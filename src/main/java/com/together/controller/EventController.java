@@ -56,10 +56,10 @@ public class EventController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{eventId}/liker/{likerId}")
-    public ResponseEntity<Void> addLiker(@PathVariable Long eventId, @PathVariable Long likerId) {
+    @PostMapping("/{eventId}/liker")
+    public ResponseEntity<Void> addLiker(@PathVariable Long eventId, @RequestParam Long userId) {
         Event event = eventService.get(eventId);
-        User user = userService.get(likerId);
+        User user = userService.get(userId);
         if (event == null || user == null) {
             return ResponseEntity.badRequest().build();
         }
