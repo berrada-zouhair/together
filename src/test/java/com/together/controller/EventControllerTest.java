@@ -1,5 +1,6 @@
 package com.together.controller;
 
+import com.together.domain.Comment;
 import com.together.domain.Event;
 import com.together.domain.Location;
 import com.together.domain.User;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import static com.together.domain.Activity.FOOTBALL;
 import static com.together.utils.UrlUtils.extractIdFromUri;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.LOCATION;
@@ -184,6 +186,61 @@ public class EventControllerTest {
 
         responseEntity = restTemplate.postForEntity(eventLocation + "/liker/9999", null, Void.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
-
     }
+
+    @Test
+    public void should_add_comments_to_an_event() throws Exception {
+        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        URI uri = restTemplate.postForLocation("/user", owner);
+        String ownerId = extractIdFromUri(uri);
+
+        Event event = new Event("EventName", "Description",
+                LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
+
+        uri = restTemplate.postForLocation("/event?owner=" + ownerId, event, Void.class);
+        String eventId = extractIdFromUri(uri);
+
+        Comment comment1 = new Comment(LocalDateTime.now(), "text1");
+        comment1.setOwner(owner);
+        Comment comment2 = new Comment(LocalDateTime.now(), "text2");
+        comment2.setOwner(owner);
+
+        restTemplate.postForLocation(uri.toString()+ "/comment?owner=" + ownerId, comment1);
+        restTemplate.postForLocation(uri.toString()+ "/comment?owner=" + ownerId, comment2);
+
+        event.addComment(comment1);
+        event.addComment(comment2);
+
+        Event storedEvent = restTemplate.getForObject("/event/" + eventId, Event.class);
+        Set<Comment> comments = storedEvent.getComments();
+
+        assertThat(comments.size()).isEqualTo(2);
+        assertThat(comments
+                .stream()
+                .map(Comment::getText)
+                .collect(toList())).containsExactlyInAnyOrder("text1", "text2");
+        assertThat(event.getComments()).isEqualTo(storedEvent.getComments());
+    }
+
+    @Test
+    public void should_have_status_400_when_comment_owner_or_event_are_not_existing() throws Exception {
+        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        URI uri = restTemplate.postForLocation("/user", owner);
+        String ownerId = extractIdFromUri(uri);
+
+        Event event = new Event("EventName", "Description",
+                LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
+
+        uri = restTemplate.postForLocation("/event?owner=" + ownerId, event, Void.class);
+        String eventId = extractIdFromUri(uri);
+
+        ResponseEntity<Void> responseEntity =
+                restTemplate.postForEntity("/event/99999/comment?owner="+ownerId, new Comment(), Void.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+
+        responseEntity =
+                restTemplate.postForEntity(uri.toString()+"/comment?owner=9999&event="+eventId, new Comment(), Void.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+    }
+
 }
