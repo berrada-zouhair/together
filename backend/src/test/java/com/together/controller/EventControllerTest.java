@@ -1,6 +1,9 @@
 package com.together.controller;
 
-import com.together.domain.*;
+import com.together.domain.Comment;
+import com.together.domain.Event;
+import com.together.domain.Location;
+import com.together.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
