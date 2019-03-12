@@ -1,9 +1,6 @@
 package com.together.controller;
 
-import com.together.domain.Comment;
-import com.together.domain.Event;
-import com.together.domain.Location;
-import com.together.domain.User;
+import com.together.domain.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +14,9 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import static com.together.domain.Activity.FOOTBALL;
+import static com.together.domain.Gender.MAN;
 import static com.together.utils.UrlUtils.extractIdFromUri;
+import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -34,7 +33,7 @@ public class EventControllerTest {
 
     @Test
     public void should_create_event_and_get_it() throws Exception {
-        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User owner = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", owner);
         assertThat(uri).isNotNull();
         String ownerId = extractIdFromUri(uri);
@@ -68,7 +67,7 @@ public class EventControllerTest {
 
     @Test
     public void should_add_participants_to_event() throws Exception {
-        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User owner = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", owner);
         String ownerId = extractIdFromUri(uri);
 
@@ -79,11 +78,11 @@ public class EventControllerTest {
         assertThat(responseEntity.getStatusCode()).isEqualTo(CREATED);
         String eventLocation = responseEntity.getHeaders().get(LOCATION).get(0);
 
-        User participant1 = new User("firstName1", "lastName1", 25, "city1", new byte[]{});
+        User participant1 = new User("firstName1", "lastName1", now(), MAN, "city1", "");
         uri = restTemplate.postForLocation("/user", participant1);
         String participantId1 = extractIdFromUri(uri);
 
-        User participant2 = new User("firstName2", "lastName2", 18, "city2", new byte[]{});
+        User participant2 = new User("firstName2", "lastName2", now(), MAN, "city2", "");
         uri = restTemplate.postForLocation("/user", participant2);
         String participantId2 = extractIdFromUri(uri);
 
@@ -105,7 +104,7 @@ public class EventControllerTest {
 
     @Test
     public void should_have_status_400_when_adding_not_existing_participant_to_an_event() throws Exception {
-        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User owner = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", owner);
         String ownerId = extractIdFromUri(uri);
 
@@ -123,7 +122,7 @@ public class EventControllerTest {
 
     @Test
     public void should_have_status_400_when_adding_participant_to_a_not_existing_event() throws Exception {
-        User user = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User user = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", user);
         String userId = extractIdFromUri(uri);
 
@@ -134,7 +133,7 @@ public class EventControllerTest {
 
     @Test
     public void should_add_liker_to_an_event() throws Exception {
-        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User owner = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", owner);
         String ownerId = extractIdFromUri(uri);
 
@@ -142,7 +141,7 @@ public class EventControllerTest {
                 LocalDateTime.now(), new Location(0D, 0D), FOOTBALL);
         String eventLocation = restTemplate.postForLocation("/event?owner=" + ownerId, event, Void.class).toString();
 
-        User liker = new User("firstName2", "lastName2", 18, "city2", new byte[]{});
+        User liker = new User("firstName2", "lastName2", now(), MAN, "city2", "");
         uri = restTemplate.postForLocation("/user", liker);
         String participantId = extractIdFromUri(uri);
 
@@ -162,7 +161,7 @@ public class EventControllerTest {
 
     @Test
     public void should_have_status_400_when_adding_liker_to_a_not_existing_event() throws Exception {
-        User user = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User user = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", user);
         String userId = extractIdFromUri(uri);
 
@@ -173,7 +172,7 @@ public class EventControllerTest {
 
     @Test
     public void should_have_status_400_when_adding_not_existing_liker_to_an_event() throws Exception {
-        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User owner = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", owner);
         String ownerId = extractIdFromUri(uri);
 
@@ -190,7 +189,7 @@ public class EventControllerTest {
 
     @Test
     public void should_add_comments_to_an_event() throws Exception {
-        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User owner = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", owner);
         String ownerId = extractIdFromUri(uri);
 
@@ -224,7 +223,7 @@ public class EventControllerTest {
 
     @Test
     public void should_have_status_400_when_comment_owner_or_event_are_not_existing() throws Exception {
-        User owner = new User("firstName", "lastName", 39, "city", new byte[]{});
+        User owner = new User("firstName", "lastName", now(), MAN, "city", "");
         URI uri = restTemplate.postForLocation("/user", owner);
         String ownerId = extractIdFromUri(uri);
 
