@@ -1,0 +1,82 @@
+<form class="Inscription__form" fxLayout="column" fxLayoutAlign="center center" [formGroup]="inscriptionForm">
+
+  <h1><i>Inscription</i></h1>
+
+  <app-container-left-aligned>
+    <mat-form-field>
+      <input matInput placeholder="Prénom" formControlName="firstName">
+      <mat-error>
+        Prénom <strong>obligatoire</strong>
+      </mat-error>
+    </mat-form-field>
+  </app-container-left-aligned>
+
+  <app-container-left-aligned>
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="Nom" formControlName="lastName">
+      <mat-error>
+        Nom <strong>obligatoire</strong>
+      </mat-error>
+    </mat-form-field>
+  </app-container-left-aligned>
+
+  <app-container-left-aligned>
+    <mat-form-field class="Inscription__very-small-input">
+      <mat-select placeholder="Civilité" formControlName="gender">
+        <mat-option value="MAN">Homme</mat-option>
+        <mat-option value="WOMAN">Femme</mat-option>
+      </mat-select>
+      <mat-error>
+        Civilité <strong>obligatoire</strong>
+      </mat-error>
+    </mat-form-field>
+  </app-container-left-aligned>
+
+  <app-container-left-aligned>
+    <mat-form-field class="Inscription__medium-input">
+      <input matInput [matDatepicker]="picker" placeholder="Date naissance" formControlName="birthDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error>
+        Date de naissance <strong>obligatoire</strong>
+      </mat-error>
+    </mat-form-field>
+  </app-container-left-aligned>
+
+  <app-container-left-aligned>
+    <mat-form-field class="Inscription__small-input">
+      <mat-select placeholder="Ville" formControlName="city">
+        <mat-option value="paris">Paris</mat-option>
+        <mat-option value="london">Londres</mat-option>
+        <mat-option value="berlin">Berlin</mat-option>
+        <mat-option value="brussels">Bruxelles</mat-option>
+      </mat-select>
+      <mat-error>
+        Ville <strong>obligatoire</strong>
+      </mat-error>
+    </mat-form-field>
+  </app-container-left-aligned>
+
+    <div fxLayout="row" fxLayoutAlign="start center" style="width: 300px">
+      <mat-form-field class="example-full-width" style="margin-right: 10px; width: 200px">
+        <input matInput disabled placeholder="Choisir une image*" [value]="fileName?fileName:''">
+        <button *ngIf="fileName" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearFile()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <input type="file" style="display: none;" (change)="onFileChange($event)" #fileButton accept="image/*">
+      </mat-form-field>
+      <button mat-raised-button (click)="selectFile()">
+        Parcourir
+      </button>
+    </div>
+
+  <app-container-left-aligned>
+    <button mat-raised-button class="Inscription__validate-button"
+            color="primary"
+            (click)="submitUser()"
+            [disabled]="!isFormValid()">
+      Inscription
+    </button>
+  </app-container-left-aligned>
+
+</form>
