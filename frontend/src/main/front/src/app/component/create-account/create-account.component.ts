@@ -26,7 +26,7 @@ export class CreateAccountComponent implements OnInit {
       firstName: [this.user.firstName, Validators.required],
       lastName: [this.user.lastName, Validators.required],
       gender: [this.user.gender, Validators.required],
-      birthDate: [moment().format('YYYY-MM-DD'), Validators.required],
+      birthDate: [this.user.birthDate, Validators.required],
       city: [this.user.city, Validators.required],
     });
   }
