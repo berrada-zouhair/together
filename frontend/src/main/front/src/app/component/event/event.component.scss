@@ -1,0 +1,26 @@
+.Event__card-avatar {
+  background-image: url('../../../assets/img/user.png');
+  background-size: cover;
+}
+
+.Event__card {
+  max-width: 400px;
+  min-width: 400px;
+  margin: 10px 0 10px 0;
+}
+
+.Event__card-time {
+  color: gray;
+  font-size: 14px;
+  text-align: right;
+}
+
+.Event__card-image {
+  max-height: 225px;
+  width: 100%;
+  margin: 0 auto 10px auto;
+}
+
+/deep/ .mat-card-header-text {
+  width: 100%;
+}

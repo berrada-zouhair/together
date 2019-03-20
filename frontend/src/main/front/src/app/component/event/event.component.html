@@ -1,0 +1,25 @@
+<mat-card class="Event__card">
+  <mat-card-header>
+    <div mat-card-avatar class="Event__card-avatar"></div>
+    <mat-card-title fxLayout="row" fxLayoutAlign="space-between center">
+      <div>{{event.name}}</div>
+      <div class="Event__card-time">{{event.date | date: 'HH:mm'}}</div>
+      </mat-card-title>
+    <mat-card-subtitle>{{event.owner.firstName}} {{event.owner.lastName}}</mat-card-subtitle>
+  </mat-card-header>
+  <img class="Event__card-image"
+       mat-card-image
+       [src]="'assets/img/'+event.activity.toString().toLowerCase()+'.jpg'"
+       [alt]="event.activity">
+  <mat-card-content>
+    <p>
+      {{event.description}}
+    </p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button matTooltip="Participer"><mat-icon>directions_run</mat-icon></button>
+    <button mat-button matTooltip="Like"><mat-icon>thumb_up_alt</mat-icon></button>
+    <button mat-button matTooltip="Commenter"><mat-icon>comment</mat-icon></button>
+  </mat-card-actions>
+</mat-card>
+

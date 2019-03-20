@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {User} from '../../model/user';
 import * as moment from 'moment';
 import {UserService} from '../../service/user.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-create-account',
@@ -17,7 +18,9 @@ export class CreateAccountComponent implements OnInit {
   public fileName: string;
   public inscriptionForm: FormGroup;
 
-  constructor(private formBuilder: FormBuilder, private userService: UserService) {
+  constructor(private formBuilder: FormBuilder,
+              private userService: UserService,
+              private router: Router) {
   }
 
 
@@ -62,6 +65,7 @@ export class CreateAccountComponent implements OnInit {
     this.user = Object.assign({}, this.inscriptionForm.value)
     this.user.picture = picture;
     this.userService.createUser(this.user).subscribe(() => {
+      this.router.navigate(['/home']);
     });
   }
 }
