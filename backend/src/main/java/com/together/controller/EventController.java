@@ -1,5 +1,6 @@
 package com.together.controller;
 
+import com.together.domain.Activity;
 import com.together.domain.Comment;
 import com.together.domain.Event;
 import com.together.domain.User;
@@ -13,9 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Set;
+
+import static java.time.LocalDateTime.now;
 
 @RestController
-@RequestMapping("/event")
+@RequestMapping("/events")
 @AllArgsConstructor
 public class EventController {
 
@@ -84,5 +89,17 @@ public class EventController {
                 .path("/{commentId}")
                 .buildAndExpand(commentId).toUri();
         return ResponseEntity.created(uri).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Event>> getEvents(@RequestParam Long userId) {
+        User user = userService.get(userId);
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        Set<Activity> activities = user.getActivities();
+        List<Event> events = eventService.get(now().withMinute(0).withSecond(0).withNano(0),
+                activities.toArray(new Activity[activities.size()]));
+        return ResponseEntity.ok().body(events);
     }
 }
