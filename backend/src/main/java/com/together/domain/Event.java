@@ -1,9 +1,6 @@
 package com.together.domain;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import static javax.persistence.GenerationType.AUTO;
 @NoArgsConstructor
 @Entity
 @EqualsAndHashCode(exclude = "id")
+@ToString(exclude = "id")
 public class Event {
 
     @Id
