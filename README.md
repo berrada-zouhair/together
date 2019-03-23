@@ -1,5 +1,5 @@
 # Together
-Is an application that allows it's users to create and partcipate to events to which they are interessted in.
+Is an application that allows its users to create and partcipate to events to which they are interessted in.
 These events could be any kind of activity : a football match, coding session or guitar learning...
 What sets Together apart from others apps is the fact that users only specify activities' type, and then they'll receive all news about it without having to enroll to any group nor community 
 
