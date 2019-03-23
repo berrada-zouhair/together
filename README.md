@@ -7,3 +7,21 @@ What sets Together apart from others apps is the fact that users only specify ac
 To keep this project growing and improving we need all help we can get, feel free to make your comments by :
 - Issues tracker available on github [here](https://github.com/berrada-zouhair/together/issues)
 - Email available: berrada902@gmail.com
+
+### Installing
+  #### Frontend
+  Run frontend application located in the `frontend/` directory.
+  
+  Install node module packages:
+  ```  
+  npm install
+  ```
+  
+  Launch the application:
+  ```  
+  npm start
+  ```
+  #### Backend
+ Run backend application located in the `/backend` directory.
+ 
+     mvn spring-boot:run  
